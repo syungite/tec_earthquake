@@ -47,9 +47,6 @@ def extract_sat_data_from_stec(sat_number, stec_file):
 
     return data
 
-
-
-
 def find_nearest_time_blocks(ctheta_time, stec_data):
     """
     cthetaの時間範囲に基づいて、STECデータのうちその範囲にあるものを見つける
@@ -68,10 +65,9 @@ def main():
     # GetPositionData.py から座標データを取得
     file_name = input("Enter the relative path of the file (default: ../data/00R015.24.pos): ")
     target_date = input("Enter the target date (YYYY MM DD): ")
-    position = input("Enter the position: ")
 
     # 座標データを取得
-    x, y, z, lat, lon = get_position_data(file_name, target_date, position)
+    x, y, z, lat, lon = get_position_data(file_name, target_date)
 
     # 取得した座標データを使ってベクトルを計算
     NN, NE, OR = calculate_vector(x, y, z, lat, lon)
@@ -105,17 +101,8 @@ def main():
             nn_dot = np.dot(NN, RS)  # NN と RS のドット積
             ne_dot = np.dot(NE, RS)  # NE と RS のドット積
 
-             # ctheta を計算
+             # ctheta, cphi を計算
             ctheta = math.sqrt(nn_dot**2 + ne_dot**2) / rs_length if rs_length != 0 else 0
-            # print(f"ctheta: {ctheta},ut_time: {ut_time}, nn_dot: {nn_dot}, ne_dot: {ne_dot}")
-            # value_inside_sqrt = 1 - (R * ctheta / (R + hiono)) ** 2
-            # print(f"value inside sqrt: {value_inside_sqrt}, ctheta: {ctheta}, R: {R}, hiono: {hiono},nn_dot: {nn_dot}")
-
-            # if value_inside_sqrt < 0:
-            #     print("Math domain error detected.")
-            #     print(f"ctheta: {ctheta}, value_inside_sqrt: {value_inside_sqrt}")
-            #     exit()  # エラーが出た場合、プログラムを終了させる
-
             cphi = math.sqrt(1-(R*ctheta/(R+hiono))**2)
 
             # STECデータのうち、cthetaの時間に対応するデータを取得
@@ -125,7 +112,6 @@ def main():
             for stec_time, stec_value in relevant_stec:
                 vtec = stec_value * cphi
                 output_data.append((stec_time, vtec))  # Store the results for output
-                # print(f"衛星番号: {sat_num}, 時刻: {stec_time}, STEC: {stec_value}, cphi: {cphi}, vtec: {vtec}")
 
     # 出力ファイルのパスを指定
     output_file_path = os.path.join('..','data', 'vtec.txt')

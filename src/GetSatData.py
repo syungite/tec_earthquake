@@ -1,7 +1,6 @@
-# GetSatData.py
 import os
 
-def read_satellite_data(file_path):
+def get_satellite_data(file_path):
     # 衛星データを読み込み、衛星番号ごとに並び替える
     satellite_data = {}
 
@@ -25,26 +24,4 @@ def read_satellite_data(file_path):
 
     return satellite_data
 
-def save_sorted_data(satellite_data, output_file_path):
-    # 衛星データをファイルに保存する
-    with open(output_file_path, 'w') as file:
-        for sat_num in sorted(satellite_data.keys()):
-            for data in satellite_data[sat_num]:
-                ut_time, x, y, z = data
-                file.write(f"{ut_time} {sat_num} {x} {y} {z}\n")
-
-def get_satellite_data(file_path):
-    satellite_data = read_satellite_data(file_path)
-    return satellite_data
-
-# メインの処理
-if __name__ == "__main__":
-    input_file = input("処理する .txt ファイル名を入力してください: ")
-    output_file = input("出力ファイル名を入力してください (default: sorted_data.txt): ")
-    if not output_file:
-        output_file = "sorted_data.txt"
-    
-    satellite_data = get_satellite_data(input_file)
-    save_sorted_data(satellite_data, output_file)
-    print(f"衛星データが {output_file} に保存されました。")
 

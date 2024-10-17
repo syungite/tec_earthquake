@@ -1,0 +1,10 @@
+Results for date: 2011 03 11
+Source file: ../data/950214.11.pos
+
+Date: 2011 03 11
+X (m): -3959969.6126
+Y (m): 3234978.4048
+Z (m): 3799716.5823
+Latitude (deg): 36.800308037
+Longitude (deg): 140.75392621
+Height (m): 75.396751055

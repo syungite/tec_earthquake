@@ -1,4 +1,3 @@
-import os
 
 def get_satellite_data(file_path):
     # 衛星データを読み込み、衛星番号ごとに並び替える

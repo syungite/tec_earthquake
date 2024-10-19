@@ -56,8 +56,10 @@ def main():
     with open("list.txt", 'w', encoding='utf-8') as f:
         for cnt, (j_name, distance, rinex, _) in enumerate(distances):
             if cnt < 50:
-                print(f"{j_name}: {distance:.2f} km {rinex}")
-                f.write(f"{j_name}: {distance:.2f} km {rinex}\n")
+                # print(f"{j_name}: {distance:.2f} km {rinex}")
+                # f.write(f"{j_name}: {distance:.2f} km {rinex}\n")                
+                print(f"{j_name}: {rinex}")
+                f.write(f"{j_name}: {rinex}\n")
 
     # 結果をmap.txtに座標形式で書き出し
     with open("map.txt", 'w', encoding='utf-8') as f:

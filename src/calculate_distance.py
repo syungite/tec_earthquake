@@ -64,7 +64,7 @@ def main():
     # 結果をmap.txtに座標形式で書き出し
     with open("map.txt", 'w', encoding='utf-8') as f:
         for cnt, (_, _, _, coordinates) in enumerate(distances):
-            if cnt < 50:
+            if cnt < 30:
                 lat, lon = coordinates
                 f.write(f"{lat}, {lon}\n")
 

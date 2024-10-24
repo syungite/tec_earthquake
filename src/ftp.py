@@ -70,7 +70,7 @@ def main():
     ftp_pass = "Geomaster10"
 
     # id.txt のファイルパス
-    id_file_path = "../data/id.txt"  # id.txtの実際のパスを指定
+    id_file_path = "../data/list.txt"  # id.txtの実際のパスを指定
 
     # ダウンロード先のローカルディレクトリ
     local_o_directory = "../data/obs"  

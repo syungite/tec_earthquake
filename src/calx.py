@@ -41,7 +41,7 @@ def main():
         output_calvtec = f"../data/vtec/vtec_{i}.txt"  # VTEC result output
         target_data = "2011 03 11"
         print("Start calculating vtec")
-        calculate_vtec(input_nav, input_obs,input_pos, output_calvtec, target_data)
+        calculate_vtec(input_nav, input_obs, input_pos, output_calvtec, target_data)
 
 
 if __name__ == "__main__":

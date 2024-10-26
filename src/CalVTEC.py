@@ -2,6 +2,7 @@
 import os
 import math
 import numpy as np
+import scipy.interpolate as interp
 from GetPositionData import get_position_data
 from GetSatData import get_satellite_data
 
@@ -19,7 +20,7 @@ def calculate_vector(a, b, c, lat, lon):
     
     return NN, NE, OR
 
-def extract_sat_data_from_stec(sat_number, stec_file):
+def extract_sat_data_from_stec(sat_number, stec_file, output_file_path="data.txt"):
     data = []
     with open(stec_file, 'r', encoding='utf-8') as file:
         extracting = False 
@@ -39,32 +40,40 @@ def extract_sat_data_from_stec(sat_number, stec_file):
                     try:
                         time = float(parts[0])  
                         value = float(parts[1])  
-                        f1 = 1.57542
-                        f2 = 1.22760
-                        stec = value * (f1 * f2)**2 /((f1**2 - f2**2)*40.308)*100  # Calculate STEC
-                        data.append((time, stec))  
+                        f1 = 1.57542 
+                        f2 = 1.22760 
+                        stec = value * (f1)**2 * (f2)**2 /((f1**2 - f2**2)*40.308) # Calculate STEC
+                        data.append((time, value))  
                     except ValueError:
                         continue
 
+    with open(output_file_path, 'w') as output_file:
+        for time, stec in data:
+            output_file.write(f"{time} {stec}\n")
     return data
 
-def find_nearest_time_blocks(ut_time, input_obs):
+# 座標補完を行う関数
+def interpolate_satellite_positions(time_points, x_values, y_values, z_values, query_times):
     """
-    Find STEC data within a time window centered around ctheta_time.
+    Interpolate satellite x, y, z positions for the given query_times based on known time_points and x_values, y_values, z_values.
     """
-    block_size = 0.05  # Time block size of 0.05 hours (3 minutes)
-    half_block = block_size / 2  # Time block will extend 1.5 minutes before and after 
-    nearest_stec = []
+    # Ensure we have at least two points for interpolation
+    if len(time_points) < 2:
+        raise ValueError("Need at least two points for interpolation")
     
-    for stec_time, stec_value in input_obs:
-        if abs(stec_time - ut_time) <= half_block:  # Check within the half-block range
-            nearest_stec.append((stec_time, stec_value))
+    # Create interpolation functions for x, y, z
+    interp_x = interp.interp1d(time_points, x_values, kind='linear', fill_value="extrapolate")
+    interp_y = interp.interp1d(time_points, y_values, kind='linear', fill_value="extrapolate")
+    interp_z = interp.interp1d(time_points, z_values, kind='linear', fill_value="extrapolate")
+
+    # Interpolate the satellite positions for the desired query times
+    interpolated_x = interp_x(query_times)
+    interpolated_y = interp_y(query_times)
+    interpolated_z = interp_z(query_times)
     
-    return nearest_stec
+    return interpolated_x, interpolated_y, interpolated_z
 
-
-def calculate_vtec(input_nav, input_obs ,input_pos, output_file_path, target_date):
-
+def calculate_vtec(input_nav, input_obs, input_pos, output_file_path, target_date):
     # 座標データを取得
     x, y, z, lat, lon = get_position_data(input_pos, target_date)
 
@@ -81,38 +90,57 @@ def calculate_vtec(input_nav, input_obs ,input_pos, output_file_path, target_dat
     # Prepare data for output
     output_data = []
 
+    # Initialize arrays for time and satellite positions to interpolate later
+    time_points = []
+    x_values = []
+    y_values = []
+    z_values = []
+
     for sat_num, data in satellite_data.items():
         if sat_num != sat_number:
             continue
         for ut_time, x_sat, y_sat, z_sat in data:
-            RS = np.array([x_sat, y_sat, z_sat]) - OR
-            rs_length = np.linalg.norm(RS)
+            time_points.append(ut_time)
+            x_values.append(x_sat)
+            y_values.append(y_sat)
+            z_values.append(z_sat)
 
-            # calculate dot products for NN and NE
-            nn_dot = np.dot(NN, RS)  
-            ne_dot = np.dot(NE, RS) 
+    # Interpolate satellite positions for STEC observation times
+    obs_times = [stec_time for stec_time, _ in obs_data]
+    interpolated_x, interpolated_y, interpolated_z = interpolate_satellite_positions(time_points, x_values, y_values, z_values, obs_times)
 
-             # calculate ctheta and cphi
-            ctheta = math.sqrt(nn_dot**2 + ne_dot**2) / rs_length if rs_length != 0 else 0
-            cphi = math.sqrt(1-(R*ctheta/(R+hiono))**2)
+    # Calculate VTEC using interpolated satellite positions
+    for i, (stec_time, stec_value) in enumerate(obs_data):
+        # Interpolated satellite position at stec_time
+        x_sat_interp = interpolated_x[i]
+        y_sat_interp = interpolated_y[i]
+        z_sat_interp = interpolated_z[i]
 
-            # STECデータのうち、cthetaの時間に対応するデータを取得
-            relevant_stec = find_nearest_time_blocks(ut_time, obs_data)
+        # Calculate RS vector
+        RS = np.array([x_sat_interp, y_sat_interp, z_sat_interp]) -OR
+        rs_length = np.linalg.norm(RS)
 
-             # Store the results for output
-            for stec_time, stec_value in relevant_stec:
-                vtec = stec_value * cphi
-                output_data.append((stec_time, vtec)) 
-    
+        # calculate dot products for NN and NE
+        nn_dot = np.dot(NN, RS)
+        ne_dot = np.dot(NE, RS)
+
+        # calculate ctheta and cphi
+        ctheta = math.sqrt(nn_dot**2 + ne_dot**2) / rs_length if rs_length != 0 else 0
+        cphi = math.sqrt(1 - (R * ctheta / (R + hiono))**2)
+        print(cphi)
+
+        # Calculate VTEC
+        vtec = stec_value * cphi
+        output_data.append((stec_time, vtec))
+
     # Create output directory if it doesn't exist
     os.makedirs(os.path.dirname(output_file_path), exist_ok=True)
 
     with open(output_file_path, 'w') as output_file:
-        for stec_time, vtec in output_data: 
+        for stec_time, vtec in output_data:
             output_file.write(f"{stec_time} {vtec}\n")
 
     print(f"Results saved to {output_file_path}")
-
 
 def main():
     """

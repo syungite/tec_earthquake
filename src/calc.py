@@ -14,7 +14,7 @@ def load_vtec_data(file_path):
         vtec = data[:, 1]
 
         # Time >= 2.00の範囲でフィルタリング
-        mask = (time >= 2.00) & (time <= 7.50)
+        mask = (time >= 2.00) & (time <= 8.50)
         time_filtered = time[mask]
         vtec_filtered = vtec[mask]
 
@@ -54,7 +54,6 @@ def cal_anomaly(time, vtec, t):
         return np.array([])
 
     anomaly = (vtec_actual[:min_length] - vtec_approx_compare[:min_length])
-    anomaly -= np.mean(anomaly)
     return anomaly
 
 
@@ -71,10 +70,10 @@ def main():
     time0_max = np.amax(time0)
     mask_delta = delta_t <= (time0_max - 2.00)
     delta_use = delta_t[mask_delta]
-    l = len(delta_use)
+    l = len(delta_t)
 
     M = 30
-    N = 50
+    N = 30
     t = 0
     c_t = []
 
@@ -82,7 +81,6 @@ def main():
         t += delta_use[i]
         if t + 4.25 >= 6.0:
             continue
-
         c = 0
         n = 1e10
         valid_data = True  # A flag to track if we got enough data across all j

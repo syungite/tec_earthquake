@@ -3,7 +3,7 @@ import subprocess
 import numpy as np
 import matplotlib.pyplot as plt
 from CalVTEC import calculate_vtec
-
+from ftp import date_to_day_of_year
 
 
 def run_rdeph(nav_file, output_rdeph):
@@ -20,12 +20,17 @@ def main():
     # Read list.txt for location names
     with open('../data/list.txt', 'r') as file:
         locations = [line.split()[1] for line in file.readlines()]
-
+    target_data = "2016 04 15"
+    year, month, day = int(target_data[0:4]), int(target_data[5:7]),int(target_data[8:10])
+    day_of_year = date_to_day_of_year(year, month, day)
+    
     # Loop over locations and process each one
     for i, location in enumerate(locations, 0):
+
         print(f"Processing No.{i} data")
-        nav_file = f"../data/nav/{location}0700.11n"  # Adjust path as needed
-        obs_file = f"../data/obs/{location}0700.11o"
+        print(location)
+        nav_file = f"../data/nav/{location}{day_of_year}0.{str(year)[-2:]}n"  # Adjust path as needed
+        obs_file = f"../data/obs/{location}{day_of_year}0.{str(year)[-2:]}o"
         output_rdeph = f"../data/rdeph/rdeph_output_{i}.txt"
         output_rdrnx = f"../data/rdrnx/rdrnx_output_{i}.txt"
 
@@ -37,11 +42,10 @@ def main():
         # Call CalVTEC.py to calculate VTEC for each location
         input_nav = f"../data/rdeph/rdeph_output_{i}.txt"  # Generated satellite data
         input_obs = f"../data/rdrnx/rdrnx_output_{i}.txt"  # Generated STEC data
-        input_pos = f"../data/pos/{location}.11.pos"  # pos editing
+        input_pos = f"../data/pos/{location}.{target_data[2:4]}.pos"  # pos editing
         output_calvtec = f"../data/vtec/vtec_{i}.txt"  # VTEC result output
-        target_data = "2011 03 11"
         print("Start calculating vtec")
-        calculate_vtec(input_nav, input_obs, input_pos, output_calvtec, target_data)
+        calculate_vtec(input_nav, input_obs, output_calvtec, obs_file)
 
 
 if __name__ == "__main__":

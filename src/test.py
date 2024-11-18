@@ -1,51 +1,34 @@
-import numpy as np
-import sys
+"""
+Runge-Kutta method 
+The differential equation is  "dy/dx = f = 1 + y/x "
+input parameter : x = 1.0, y(1) = 0 (initial value), h = 0.1 (step width)
+output parameter : x , y (solution of runge-kutta), xlogx (exact solution)
+Auther : Shunsuke Motoi, Date: 2024/11/12, Version : 1.00
+"""
+import math 
 
-x_0 = [8500/33, 500/33, 500/33, 50/41]
-x_before = [0, 0, 0, 0]
-x_after = [0, 0, 0, 0]
+def rungeKutta_method(x, y, h):
+    k1 = h * f(x, y)
+    k2 = h * f(x + h/2.0, y + k1/2.0)
+    k3 = h * f(x + h/2.0, y + k2/2.0)
+    k4 = h * f(x + h, y + k3)
+    return (k1 + 2*k2 + 2*k3 + k4)/6.0
 
-k1 = [[0, 0, 0, 0],[-16/33, 0, 0, 0],[0, -16/33, 0, 0],[0, 0, -40/41, 0]]
-k2 = [[0, -16/33, 0, 0],[0, 0, -16/33, 0],[0, 0, 0, -16/33],[0, 0, 0, 0]]
-
-def inner_product(a, b):
-    if(len(a) != len(b)):
-        print("Can't calculate innner product")
-        sys.exit()
-        
-    s = len(a)
-    p = 0
-    for i in range(s):
-        p += a[i] * b[i]
-    return p
-
-def compare(x_after, x_before):
-    flag = True
-    for i in range(4):
-        if(abs(x_after[i] - x_before[i]) >= 1e-3): flag = False
-    return flag
-
-def cal0(x_after):
-    global x_0
-    x_after[0] = x_0[0]
-    x_after[1] = x_0[1] + (16/33)*x_after[0]
-    x_after[2] = x_0[2] + (16/33)*x_after[1]
-    x_after[3] = x_0[3] + (40/41)*x_after[2]
-    return x_after
+def f(x, y):
+    return 1 + y/x
 
 def main():
-    global x_0, x_before, x_after
-    x_after = cal0(x_after)
-    cnt = 1
-    while True:
-        x_after = [0,0,0,0]
-        for i in range(4):
-            x_after[i] = x_0[i] - inner_product(k1[i], x_after) - inner_product(k2[i], x_before)
-        print(f"{cnt}: {x_after}")   
-        if(compare(x_after, x_before)): break  
-        x_before = x_after
-        cnt+=1
+    x, y, h = 1.0, 0.0, 0.1
+    print("x  |     y    |   xlogx")
 
+    # calculate the value of y where x(1.1 ~ 2.0)
+    for i in range(10):
+        y = y + rungeKutta_method(x, y, h)
+
+        # update x (1.1 ... 2.0)
+        x = 1 + (i + 1)*0.1
+    
+        print(f"{'{:.1f}'.format(x)}| {'{:.6f}'.format(y)} | {'{:.6f}'.format(x * math.log(x))}")
 
 if __name__ == "__main__":
     main()

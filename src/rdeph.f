@@ -1,4 +1,3 @@
-c
       program rdeph
 c
 c     a program to read rinex ephsmeris file and satellite position in Earth-fixed
@@ -11,94 +10,91 @@ c    13:i0   14:Crc 15:omega   16:OmegaDot
 c    17:iDot 18-28: not used
 c
       parameter (maxsat=40, maxepch=30, maxrec=400)
-      implicit real*4 (a-h,o-z)
+      implicit real*8 (a-h,o-z)
 c
-      real*8 dxyz,oel
-      dimension oel(28,maxrec),idsat(maxrec),tiempo(maxrec)
-     1         ,i1stsat(maxsat),dxyz(3)
-      character lscr*1, lbuf*80, lcmt*20,lfile*64
-c 
-      tstep=0.05        ! output every 3 minutes
+      real*8 dxyz, oel
+      dimension oel(28, maxrec), idsat(maxrec), tiempo(maxrec)
+     1         , i1stsat(maxsat), dxyz(3)
+      character lscr*1, lbuf*80, lcmt*20, lfile*64
 c
-      tstart=0.0
-      tend=24.0
+      tstep = 0.001        ! output every 3 minutes
+      tstart = 0.0
+      tend = 24.0
 c
 c-----reading header
 c
  1111 continue
-      read(5,100)lcmt
-  100 format(60x,a20)
+      read(5, 100) lcmt
+  100 format(60x, a20)
 c
-      if(lcmt(1:13).ne.'END OF HEADER') goto 1111
+      if (lcmt(1:13) .ne. 'END OF HEADER') goto 1111
 c
 c-----reading data
 c
-      krec=1
- 2222 read(5,110,end=3333)lbuf
+      krec = 1
+ 2222 read(5, 110, end=3333) lbuf
   110 format(a80)
-      read(lbuf,130)idsat(krec),iy,imon,iday,ih,imin,sec
-  130 format(i2,5i3,f5.1)
-      tiempo(krec)=real(ih)+real(imin)/60.0 + sec/3600.0 
-      do irec=1,7
-        ii=(irec-1)*4
-        if(irec.ne.7) then
-         read(5,140)(oel(k,krec),k=ii+1,ii+4)
+      read(lbuf, 130) idsat(krec), iy, imon, iday, ih, imin, sec
+  130 format(i2, 5i3, f5.1)
+      tiempo(krec) = real(ih) + real(imin) / 60.0 + sec / 3600.0
+      do irec = 1, 7
+        ii = (irec - 1) * 4
+        if (irec .ne. 7) then
+          read(5, 140) (oel(k, krec), k = ii + 1, ii + 4)
         else
-         read(5,140)(oel(k,krec),k=ii+1,ii+1)
-         do k=ii+2,ii+4
-           oel(k,krec)=0.0
-         enddo
+          read(5, 140) (oel(k, krec), k = ii + 1, ii + 1)
+          do k = ii + 2, ii + 4
+            oel(k, krec) = 0.0
+          enddo
         endif
-  140 format(3x,4(d19.12))
+  140   format(3x, 4(d19.12))
       enddo
-      krec=krec+1
+      krec = krec + 1
       goto 2222
  3333 close(1)
-      mrec=krec-1 
+      mrec = krec - 1
 c      
-c-----finding 1st appearence of satellites
+c-----finding 1st appearance of satellites
 c
-      do isat=1,maxsat
-        i1stsat(isat)=0
+      do isat = 1, maxsat
+        i1stsat(isat) = 0
       enddo
 c
-      do krec=1,mrec
-        if(i1stsat(idsat(krec)).eq.0) i1stsat(idsat(krec))=krec
+      do krec = 1, mrec
+        if (i1stsat(idsat(krec)) .eq. 0) i1stsat(idsat(krec)) = krec
       enddo
 c
 c-----calculating satellite positions
 c
-      time=0.0
-c
+      nstep = 0
  4444 continue
-c
-      if(time.ge.tstart) then
-        do isat=1,maxsat
-          jrec=i1stsat(isat)
-          if(jrec.ne.0) then
-           time0=tiempo(jrec)
-           call gtxyz(time,time0,oel(1,jrec),dxyz)
-           write(6,150)time,isat,(dxyz(k),k=1,3)
-  150      format(f8.2,i3,3(1x,d17.11))
+      time = tstart + nstep * tstep
+      if (time .ge. tstart) then
+        do isat = 1, maxsat
+          jrec = i1stsat(isat)
+          if (jrec .ne. 0) then
+            time0 = tiempo(jrec)
+            call gtxyz(time, time0, oel(1, jrec), dxyz)
+            write(6, 150) time, isat, (dxyz(k), k = 1, 3)
+  150       format(f8.3, i3, 3(1x, d17.11))
           endif
         enddo
       endif
-c
-      time=time+tstep
-      if(time.gt.tend) goto 9999
+      nstep = nstep + 1
+      if (time .gt. tend) goto 9999
       goto 4444
-c      
+c
  9999 continue
 c
       stop
       end
-c
+
 c------------------------------------------------------------------------
 c
       subroutine gtxyz(time,time0,ele,dxyz)
 c
       implicit real*8 (a-h,o-z)
-      real*4 time,time0
+      real*8 time,time0
 c
       dimension dxyz(3),ele(28)
       data GM/3986005.d8/

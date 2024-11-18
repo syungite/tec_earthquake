@@ -1,74 +1,73 @@
 import math
 import glob
 from geopy.distance import geodesic
-
-def parse_pos_file(file_path):
+from map import read_locations_from_file
+def parse_pos_file(file_path, year, month, day):
     j_name = None
     coordinates = None
-    target_date = " 2011 03 11 12:00:00"
+    rinex = None  # rinexの初期化
+    target_date = f" {year} {str(month).zfill(2)} {str(day).zfill(2)} 12:00:00"
 
     with open(file_path, 'r', encoding='utf-8') as f:
         lines = f.readlines()
-        for i, line in enumerate(lines):
+        for line in lines:
             if line.startswith(" J_NAME"):
                 j_name = line.split()[1]
-                # print(f"Found J_NAME: {j_name}")  # J_NAMEを見つけたら表示
             if line.startswith(" RINEX"):
                 rinex = line.split()[1]
-                # print(f"RINEX: {rinex}")  # IDを見つけたら表示
             if line.startswith(target_date):
                 data = line.split()
                 lat = float(data[7])
                 lon = float(data[8])
                 coordinates = (lat, lon)
-                # print(f"Found coordinates: {coordinates}")  # 座標を見つけたら表示
                 break
 
-    return j_name, coordinates,rinex
+    return j_name, coordinates, rinex
 
 def calculate_distance(coord1, coord2):
     return geodesic(coord1, coord2).kilometers
 
-def main():
-    kitaibaraki_coordinates = (36.800303696, 140.75393788)
-    pos_files = glob.glob("../data/coordinate/2011/*.pos")
+def process_pos_files(year, month, day, center_coordinate):
+    pos_files = glob.glob(f"../data/coordinate/{year}/*.pos")
     distances = []
 
     if not pos_files:
-        print("No .pos files found in the directory.")  # .posファイルが見つからない場合
+        print("No .pos files found in the directory.")
         return
 
     for file in pos_files:
-        j_name, coordinates, rinex = parse_pos_file(file)
+        j_name, coordinates, rinex = parse_pos_file(file, year, month, day)
         if j_name and coordinates:
-            if j_name != "北茨城":
-                distance = calculate_distance(kitaibaraki_coordinates, coordinates)
-                distances.append((j_name, distance, rinex,coordinates))
+            distance = calculate_distance(center_coordinate, coordinates)
+            distances.append((j_name, distance, rinex, coordinates))
 
     if not distances:
-        print("No distances calculated.")  # 距離が計算されなかった場合
+        print("No distances calculated.")
         return
 
     distances.sort(key=lambda x: x[1])
-
-
     # 結果をlist.txtに書き出し
-    with open("list.txt", 'w', encoding='utf-8') as f:
+    with open("../data/list.txt", 'w', encoding='utf-8') as f:
         for cnt, (j_name, distance, rinex, _) in enumerate(distances):
-            if cnt < 50:
-                # print(f"{j_name}: {distance:.2f} km {rinex}")
-                # f.write(f"{j_name}: {distance:.2f} km {rinex}\n")                
-                print(f"{j_name}: {rinex}")
+            #if cnt < 52 and rinex != '1176':
+            if cnt < 31:
+                print(f"{j_name}: {distance}")
                 f.write(f"{j_name}: {rinex}\n")
 
+
     # 結果をmap.txtに座標形式で書き出し
-    with open("map.txt", 'w', encoding='utf-8') as f:
-        for cnt, (_, _, _, coordinates) in enumerate(distances):
-            if cnt < 30:
+    with open("../data/map.txt", 'w', encoding='utf-8') as f:
+        for cnt, (j_name, _, rinex, coordinates) in enumerate(distances):
+            #if cnt < 52 and rinex != '1176':
+            if cnt < 31:
                 lat, lon = coordinates
-                f.write(f"{lat}, {lon}\n")
+                f.write(f"{lat}, {lon}, {j_name}\n")
 
-
+# 単独で実行された場合
 if __name__ == "__main__":
-    main()
+    year, month, day = 2011, 3, 11
+    center_coordinate = (3.3730719293E+01,  1.3047677275E+02)
+    process_pos_files(year, month, day, center_coordinate)
+    read_locations_from_file("../data/map.txt")
+
 

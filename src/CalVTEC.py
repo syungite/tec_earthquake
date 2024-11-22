@@ -5,9 +5,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 from GetSatData import get_satellite_data
 from getpos import extract_coordinates_from_obs
+from satpos import satpos
 
 # Constants
-R = 6378  # Earth's radius in kilometers
+R = 6300  # Earth's radius in kilometers
 hiono = 300  # Ionosphere height in kilometers
 
 def calculate_vector(a, b, c, lat, lon):
@@ -46,9 +47,10 @@ def extract_sat_data_from_stec(sat_number, stec_file):
 def calculate_vtec(input_nav, input_obs, output_file_path, obs_file):
     x, y, z, lat, lon = extract_coordinates_from_obs(obs_file)
     NN, NE, OR = calculate_vector(x, y, z, lat, lon)
+    print(OR)
 
     # get the position of satellite(sat_num)
-    sat_number = 17
+    sat_number = 26
     satellite_data = get_satellite_data(input_nav, sat_number)
     if satellite_data is None:
         print(f"No data found for satellite number {sat_number}.")
@@ -58,7 +60,8 @@ def calculate_vtec(input_nav, input_obs, output_file_path, obs_file):
     output_data = []
     cphi_data = []
     sat_data_dict = {time: (x, y, z) for time, x, y, z in satellite_data}
-
+    # if input_obs == "../data/rdrnx/rdrnx_output_0.txt":
+    #     satpos(sat_data_dict, obs_data, OR, NN, NE)
     for stec_time, stec_value in obs_data:
         if stec_time not in sat_data_dict:
             print(f"No satellite position data for time {stec_time}, skipping.")
@@ -71,12 +74,12 @@ def calculate_vtec(input_nav, input_obs, output_file_path, obs_file):
 
         nn_dot = np.dot(NN, RS)
         ne_dot = np.dot(NE, RS)
-
         ctheta = math.sqrt(nn_dot**2 + ne_dot**2) / rs_length 
+        #if(ctheta <= math.cos(math.radians(15))):
         cphi = math.sqrt(1 - (R * ctheta / (R + hiono))**2)
 
         vtec = stec_value * cphi
-        cphi_data.append((stec_time, vtec))
+        cphi_data.append((stec_time, ctheta))
         output_data.append((stec_time, vtec))
 
     os.makedirs(os.path.dirname(output_file_path), exist_ok=True)
@@ -86,18 +89,6 @@ def calculate_vtec(input_nav, input_obs, output_file_path, obs_file):
             output_file.write(f"{stec_time} {vtec}\n")
 
     print(f"Results saved to {output_file_path}")
-
-    if input_nav == "../data/rdeph/rdeph_output_0.txt":
-        obs_data = np.array(cphi_data)
-        fig, ax = plt.subplots(figsize=(8, 8))
-        ax.scatter(obs_data[:, 0], obs_data[:, 1], s=15, color='r')
-        ax.set_title('')
-        ax.set_xlabel('Time (s)')
-        ax.set_ylabel('C(t)')
-        ax.grid(True)
-        plt.tight_layout()
-        plt.savefig("../data/tec0.png")
-        plt.show()
 
 def main():
     stec_file = input("PATH to STEC file: ")

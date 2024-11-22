@@ -20,7 +20,7 @@ def main():
     # Read list.txt for location names
     with open('../data/list.txt', 'r') as file:
         locations = [line.split()[1] for line in file.readlines()]
-    target_data = "2016 04 15"
+    target_data = "2011 03 11"
     year, month, day = int(target_data[0:4]), int(target_data[5:7]),int(target_data[8:10])
     day_of_year = date_to_day_of_year(year, month, day)
     

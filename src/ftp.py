@@ -112,10 +112,10 @@ def main():
     subprocess.run(['rm', '-rf', '../data/obs/*'])
     subprocess.run(['rm', '-rf', '../data/nav/*'])
     subprocess.run(['rm', '-rf', '../data/pos/*'])
-    year = 2016
-    month = 4
-    day = 15
-    center_coordinate = (3.3730719293E+01,  1.3047677275E+02)
+    year = 2011
+    month = 3
+    day = 11
+    center_coordinate = (3.6800309526E+01,  1.4075391238E+02)
     day_of_year = date_to_day_of_year(year, month, day)
     process_pos_files(year,month, day, center_coordinate)
 

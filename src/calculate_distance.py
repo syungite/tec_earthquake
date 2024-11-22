@@ -48,11 +48,13 @@ def process_pos_files(year, month, day, center_coordinate):
     distances.sort(key=lambda x: x[1])
     # 結果をlist.txtに書き出し
     with open("../data/list.txt", 'w', encoding='utf-8') as f:
-        for cnt, (j_name, distance, rinex, _) in enumerate(distances):
+        for cnt, (j_name, distance, rinex, coordinates) in enumerate(distances):
             #if cnt < 52 and rinex != '1176':
-            if cnt < 31:
-                print(f"{j_name}: {distance}")
+            if cnt < 32 and rinex != '1176':
+                print(f"{j_name}: {rinex}")
                 f.write(f"{j_name}: {rinex}\n")
+                #lat, lon = coordinates
+                #f.write(f"{lat}, {lon}\n")
 
 
     # 結果をmap.txtに座標形式で書き出し
@@ -66,7 +68,7 @@ def process_pos_files(year, month, day, center_coordinate):
 # 単独で実行された場合
 if __name__ == "__main__":
     year, month, day = 2011, 3, 11
-    center_coordinate = (3.3730719293E+01,  1.3047677275E+02)
+    center_coordinate = (3.6800309526E+01,  1.4075391238E+02)
     process_pos_files(year, month, day, center_coordinate)
     read_locations_from_file("../data/map.txt")
 

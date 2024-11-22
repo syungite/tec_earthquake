@@ -16,14 +16,14 @@ center_lat, center_lon = 36.800303696, 140.75393788
 mymap = folium.Map(location=[center_lat, center_lon], zoom_start=10)
 
 # map.txt から座標データを読み込む
-locations = read_locations_from_file("../data/map.txt")
+locations = read_locations_from_file("../../data/map.txt")
 
 # 各ポイントを地図上に追加
 for loc in locations:
     folium.Marker([loc["lat"], loc["lon"]], popup=f"Lat: {loc['lat']}, Lon: {loc['lon']}, {loc['rnx']}").add_to(mymap)
 
 # 地図をHTMLファイルに保存
-mymap.save("../data/map.html")
+mymap.save("../../data/map.html")
 
 print("Map has been saved to map.html.")
 

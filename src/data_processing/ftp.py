@@ -109,9 +109,9 @@ def read_coordinate_from_file(file_path):
     return coordinate_list
 
 def main():
-    subprocess.run(['rm', '-rf', '../data/obs/*'])
-    subprocess.run(['rm', '-rf', '../data/nav/*'])
-    subprocess.run(['rm', '-rf', '../data/pos/*'])
+    subprocess.run(['rm', '-rf', '../../data/obs/*'])
+    subprocess.run(['rm', '-rf', '../../data/nav/*'])
+    subprocess.run(['rm', '-rf', '../../data/pos/*'])
     year = 2011
     month = 3
     day = 11
@@ -123,11 +123,11 @@ def main():
     ftp_user = "goldrunner"
     ftp_pass = "Geomaster10"
 
-    id_file_path = "../data/list.txt"  
+    id_file_path = "../../data/list.txt"  
 
-    local_o_directory = "../data/obs"
-    local_n_directory = "../data/nav"
-    local_pos_directory = "../data/pos"
+    local_o_directory = "../../data/obs"
+    local_n_directory = "../../data/nav"
+    local_pos_directory = "../../data/pos"
 
     # RINEX IDと地点IDのリストを取得
     rinex_list = read_rinex_from_file(id_file_path)

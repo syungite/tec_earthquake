@@ -1,7 +1,7 @@
 import math
 import glob
 from geopy.distance import geodesic
-from map import read_locations_from_file
+#from map import read_locations_from_file
 def parse_pos_file(file_path, year, month, day):
     j_name = None
     coordinates = None
@@ -70,6 +70,6 @@ if __name__ == "__main__":
     year, month, day = 2011, 3, 11
     center_coordinate = (3.6800309526E+01,  1.4075391238E+02)
     process_pos_files(year, month, day, center_coordinate)
-    read_locations_from_file("../../data/map.txt")
+    #read_locations_from_file("../../data/map.txt")
 
 

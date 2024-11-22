@@ -9,21 +9,27 @@ def read_locations_from_file(file_path):
             locations.append({"lat": lat, "lon": lon, "rnx": rnx})
     return locations
 
-# 中心点の設定（例として北茨城）
-center_lat, center_lon = 36.800303696, 140.75393788
+def show_map(center_coordinate):
+    # setting the center point
+    center_lat, center_lon = center_coordinate[0], center_coordinate[1]
 
-# 地図の作成
-mymap = folium.Map(location=[center_lat, center_lon], zoom_start=10)
+    # create map
+    mymap = folium.Map(location=[center_lat, center_lon], zoom_start=10)
 
-# map.txt から座標データを読み込む
-locations = read_locations_from_file("../../data/map.txt")
+    # load coordinate data from map.txt
+    locations = read_locations_from_file("../data/map.txt")
 
-# 各ポイントを地図上に追加
-for loc in locations:
-    folium.Marker([loc["lat"], loc["lon"]], popup=f"Lat: {loc['lat']}, Lon: {loc['lon']}, {loc['rnx']}").add_to(mymap)
+    # 各ポイントを地図上に追加
+    for loc in locations:
+        folium.Marker([loc["lat"], loc["lon"]], popup=f"Lat: {loc['lat']}, Lon: {loc['lon']}, {loc['rnx']}").add_to(mymap)
 
-# 地図をHTMLファイルに保存
-mymap.save("../../data/map.html")
+    # 地図をHTMLファイルに保存
+    mymap.save("../data/map.html")
 
-print("Map has been saved to map.html.")
+    print("Map has been saved to map.html.")
+
+if __name__ == "__main__":
+    # example (kitaibaraki)
+    coordinates = (3.6800309526E+01,  1.4075391238E+02)
+    show_map(coordinates)
 

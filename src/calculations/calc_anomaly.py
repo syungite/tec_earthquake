@@ -57,7 +57,7 @@ def time_to_str(seconds):
     """Convert seconds to a time string (HH:MM:SS)."""
     return str(datetime.timedelta(seconds=seconds))
 
-def main():
+def calc_anomally_and_plot():
     vtec_dir = "../data/vtec"  # Directory containing vtec_i.txt files
 
     M = 30
@@ -142,7 +142,7 @@ def main():
 
         # Adjust the layout to prevent overlap
         plt.tight_layout()
-
+        print("Yes")
         # Save and display the plot
         plt.savefig("../data/anomaly_plot.png", dpi=300)  # High-quality image
         plt.show()
@@ -151,4 +151,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    calc_anomally_and_plot()

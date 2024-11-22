@@ -3,9 +3,9 @@ import os
 import math
 import numpy as np
 import matplotlib.pyplot as plt
-from GetSatData import get_satellite_data
-from getpos import extract_coordinates_from_obs
-from satpos import satpos
+from calculations.GetSatData import get_satellite_data
+from calculations.getpos import extract_coordinates_from_obs
+from calculations.satpos import satpos
 
 # Constants
 R = 6300  # Earth's radius in kilometers

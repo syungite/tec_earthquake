@@ -2,7 +2,7 @@ import os
 import subprocess
 import numpy as np
 import matplotlib.pyplot as plt
-from CalVTEC import calculate_vtec
+from vtec_calculator import calculate_vtec
 from ftp import date_to_day_of_year
 
 
@@ -39,13 +39,13 @@ def main():
         run_rdrnx(obs_file, output_rdrnx)
         print("end frotran")
 
-        # Call CalVTEC.py to calculate VTEC for each location
+        # Call vtec_calculator.py to calculate VTEC for each location
         input_nav = f"../data/rdeph/rdeph_output_{i}.txt"  # Generated satellite data
         input_obs = f"../data/rdrnx/rdrnx_output_{i}.txt"  # Generated STEC data
         input_pos = f"../data/pos/{location}.{target_data[2:4]}.pos"  # pos editing
-        output_calvtec = f"../data/vtec/vtec_{i}.txt"  # VTEC result output
+        output_calcvtec = f"../data/vtec/vtec_{i}.txt"  # VTEC result output
         print("Start calculating vtec")
-        calculate_vtec(input_nav, input_obs, output_calvtec, obs_file)
+        calculate_vtec(input_nav, input_obs, output_calcvtec, obs_file)
 
 
 if __name__ == "__main__":

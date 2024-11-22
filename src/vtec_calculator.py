@@ -1,4 +1,4 @@
-# CalVTEC.py
+# vtec_calculator.py
 import os
 import math
 import numpy as np
@@ -99,8 +99,8 @@ def main():
     input_pos = input("Enter the relative path to the position file (default: ../data/00R015.24.pos): ")
     target_date = input("Enter the target date (YYYY MM DD): ")
 
-    output_calvtec = "../data/vtec/vtec_test.txt"
-    calculate_vtec(input_nav, input_obs, input_pos, output_calvtec, target_date)
+    output_calcvtec = "../data/vtec/vtec_test.txt"
+    calculate_vtec(input_nav, input_obs, input_pos, output_calcvtec, target_date)
 
 if __name__ == "__main__":
     main()

@@ -1,40 +1,34 @@
-import requests
+"""
+Runge-Kutta method 
+The differential equation is  "dy/dx = f = 1 + y/x "
+input parameter : x = 1.0, y(1) = 0 (initial value), h = 0.1 (step width)
+output parameter : x , y (solution of runge-kutta), xlogx (exact solution)
+Auther : Shunsuke Motoi, Date: 2024/11/12, Version : 1.00
+"""
+import math 
 
-def get_coordinate(place_name):
-    """
-    国土地理院APIを使用して、場所名から緯度経度を取得する関数。
-    """
-    url = "https://msearch.gsi.go.jp/address-search/AddressSearch"
-    params = {"q": place_name}
-    r = requests.get(url, params=params)
-    
-    # HTTPエラー処理
-    if r.status_code != 200:
-        print(f"HTTPエラー：{r.status_code}")
-        return None, None
-    
-    data = r.json()
-    
-    # データが空の場合
-    if not data:
-        print("データが見つかりませんでした。")
-        return None, None
-    
-    # 完全一致する施設名が見つかればその緯度経度を返す
-    for row in data:
-        if row["properties"]["title"].startswith(place_name):
-            coordinate = row["geometry"]["coordinates"]
-            title = row["properties"]["title"]
-            return coordinate, title
-    
-    # 見つからなかった場合
-    print("指定された場所が見つかりませんでした。")
-    return None, None
+def rungeKutta_method(x, y, h):
+    k1 = h * f(x, y)
+    k2 = h * f(x + h/2.0, y + k1/2.0)
+    k3 = h * f(x + h/2.0, y + k2/2.0)
+    k4 = h * f(x + h, y + k3)
+    return (k1 + 2*k2 + 2*k3 + k4)/6.0
 
-# 本田技研工業伊東研修センターの緯度経度を取得
-coordinates, title = get_coordinate("京都市立花背第二中学校")
+def f(x, y):
+    return 1 + y/x
 
-if coordinates:
-    print(f"{title} の緯度経度は: {coordinates}")
-else:
-    print("緯度経度が取得できませんでした。")
+def main():
+    x, y, h = 1.0, 0.0, 0.1
+    print("x  |     y    |   xlogx")
+
+    # calculate the value of y where x(1.1 ~ 2.0)
+    for i in range(10):
+        y = y + rungeKutta_method(x, y, h)
+
+        # update x (1.1 ... 2.0)
+        x = 1 + (i + 1)*0.1
+    
+        print(f"{'{:.1f}'.format(x)}| {'{:.6f}'.format(y)} | {'{:.6f}'.format(x * math.log(x))}")
+
+if __name__ == "__main__":
+    main()

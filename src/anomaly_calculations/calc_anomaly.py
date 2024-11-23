@@ -53,16 +53,14 @@ def cal_anomaly(time, vtec, t):
 
     return anomaly
 
-def time_to_str(seconds):
-    """Convert seconds to a time string (HH:MM:SS)."""
-    return str(datetime.timedelta(seconds=seconds))
 
-def calc_anomally_and_plot():
+
+def calc_anomally_and_plot(start_time, end_time):
     vtec_dir = "../data/vtec"  # Directory containing vtec_i.txt files
 
     M = 30
     N = 30
-    t_begin, t_end = 4.35 * 3600, 6.8 * 3600  # Convert to seconds
+    t_begin, t_end = start_time * 3600, end_time * 3600  # Convert to seconds
     t = t_begin
     v0_file = os.path.join(vtec_dir, "vtec_0_output.txt")
     time0, vtec0 = load_vtec_data(v0_file, t_begin, t_end)
@@ -74,7 +72,6 @@ def calc_anomally_and_plot():
 
         # Load the VTEC data
         time0, vtec0 = load_vtec_data(v0_file, t_begin, t_end)
-        print(f"{j} {len(time0)} {len(vtec0)} {time0[0]}")
     c_t = []
 
     for i in range(l):
@@ -89,7 +86,6 @@ def calc_anomally_and_plot():
             only_in_time0 = set(time0) - set(time)
             only_in_time = set(time) - set(time0)
             if(len(only_in_time) > 0 or len(only_in_time0) > 0):
-                print(f"{time_to_str(t)} {j}")
                 print("Only in time0:", only_in_time0)
                 print("Only in time:", only_in_time)
 
@@ -106,48 +102,8 @@ def calc_anomally_and_plot():
         #print(f"{time_to_str(t)} {c}")
         c_t.append((t, c))
         t += 30
-
-    # Plotting graph
-    if len(c_t) > 0:
-        fig, ax = plt.subplots(figsize=(8, 8))
-        c_t = np.array(c_t)
-        # Convert seconds to time string (HH:MM:SS) for x-axis labels
-        time_labels = [time_to_str(t) for t in c_t[:, 0]]
-
-        # Set background color to a lighter gray
-        ax.set_facecolor('#F0F0F0')  # Set the background color to an even lighter gray
-        fig.patch.set_facecolor('#F0F0F0')  # Set the entire figure's background to the lighter gray
-
-        # Plotting data points (scatter plot)
-        ax.scatter(time_labels, c_t[:, 1], s=10, color='r', zorder=5)  # Increase zorder to put points above the lines
-        ax.set_title('Anomaly Values Over Time')
-        ax.set_xlabel('Time (HH:MM:SS)')
-        ax.set_ylabel('C(t)')
-        ax.set_ylim(-5, 25)
-        ax.grid(True, color='white', linestyle='-', linewidth=0.5, zorder=3)
-        #print(time_labels)
-        # Set x-axis major ticks every 30 minutes
-        ax.set_xticks(time_labels[18::60])  # Show every second time point for 30-minute intervals
-
-        # Add vertical lines every 15 minutes (every 30 time points)
-        for i in range(0, len(c_t)-18, 30):  # Every 30 time points, which corresponds to 15 minutes
-            ax.axvline(time_labels[i+18], color='white', linestyle='-', alpha=0.5, zorder=2)
-
-        # Convert 5:46:00 to seconds and add vertical line at that point
-        target_time_seconds = 5 * 3600 + 46 * 60  # Convert 5:46:00 to total seconds
-        target_time_str = time_to_str(target_time_seconds)  # Convert back to HH:MM:SS for plotting
-
-        # Add the vertical line at 5:46:00 (in seconds)
-        ax.axvline(target_time_str, color='black', linestyle='-', alpha=0.8, zorder=1)  # Black line at 5:46:00
-
-        # Adjust the layout to prevent overlap
-        plt.tight_layout()
-        print("Yes")
-        # Save and display the plot
-        plt.savefig("../data/anomaly_plot.png", dpi=300)  # High-quality image
-        plt.show()
-    else:
-        print("No valid data to plot.")
+    return c_t
+    
 
 
 if __name__ == "__main__":

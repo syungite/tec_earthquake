@@ -17,7 +17,6 @@ def test_ftp_connection(ftp_host, ftp_user, ftp_pass):
         ftp = ftplib.FTP(ftp_host)
         ftp.login(ftp_user, ftp_pass)
         print(f"Successfully connected to {ftp_host}")
-        print("Current directory:", ftp.pwd())
         return ftp
     except ftplib.all_errors as e:
         print("FTP error:", e)
@@ -39,7 +38,7 @@ def download_and_extract_gz_file(ftp, remote_file_path, local_file_path):
 
         # 解凍成功後、.gzファイルを削除
         os.remove(temp_gz_path)
-        print(f"Downloaded and extracted: {local_file_path}")
+        print(f"Downloaded: {local_file_path}")
 
     except ftplib.error_perm as e:
         print(f"Error downloading {remote_file_path}: {e}")
@@ -95,6 +94,7 @@ def download_and_process_data(year, month, day):
 
         # FTPセッションを終了
         ftp.quit()
+    print("end ftp connecting")
 
 if __name__ == "__main__":
     year = 2011

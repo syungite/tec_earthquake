@@ -3,9 +3,9 @@ import os
 import math
 import numpy as np
 import matplotlib.pyplot as plt
-from calculations.GetSatData import get_satellite_data
-from calculations.getpos import extract_coordinates_from_obs
-from calculations.satpos import satpos
+from tec_calculations.extract_sat_coordinates import get_satellite_data
+from tec_calculations.extract_obs_coordinates import extract_coordinates_from_obs
+from tec_calculations.satpos import satpos
 
 # Constants
 R = 6300  # Earth's radius in kilometers
@@ -44,10 +44,9 @@ def extract_sat_data_from_stec(sat_number, stec_file):
                         continue
     return obs_data
 
-def calculate_vtec(input_nav, input_obs, output_file_path, obs_file):
+def calculate_vtec(input_nav, input_stec, output_file_path, obs_file):
     x, y, z, lat, lon = extract_coordinates_from_obs(obs_file)
     NN, NE, OR = calculate_vector(x, y, z, lat, lon)
-    print(OR)
 
     # get the position of satellite(sat_num)
     sat_number = 26
@@ -56,12 +55,11 @@ def calculate_vtec(input_nav, input_obs, output_file_path, obs_file):
         print(f"No data found for satellite number {sat_number}.")
         return
     
-    obs_data = extract_sat_data_from_stec(sat_number, input_obs)
+    obs_data = extract_sat_data_from_stec(sat_number, input_stec)
     output_data = []
     cphi_data = []
     sat_data_dict = {time: (x, y, z) for time, x, y, z in satellite_data}
-    # if input_obs == "../data/rdrnx/rdrnx_output_0.txt":
-    #     satpos(sat_data_dict, obs_data, OR, NN, NE)
+
     for stec_time, stec_value in obs_data:
         if stec_time not in sat_data_dict:
             print(f"No satellite position data for time {stec_time}, skipping.")
@@ -93,14 +91,14 @@ def calculate_vtec(input_nav, input_obs, output_file_path, obs_file):
 def main():
     stec_file = input("PATH to STEC file: ")
     sat_number = input("SELECT satellite number: ")
-    input_obs = extract_sat_data_from_stec(sat_number, stec_file)
+    input_stec = extract_sat_data_from_stec(sat_number, stec_file)
 
     input_nav = input("Enter the .txt file name for satellite data: ")
     input_pos = input("Enter the relative path to the position file (default: ../data/00R015.24.pos): ")
     target_date = input("Enter the target date (YYYY MM DD): ")
 
     output_calcvtec = "../data/vtec/vtec_test.txt"
-    calculate_vtec(input_nav, input_obs, input_pos, output_calcvtec, target_date)
+    calculate_vtec(input_nav, input_stec, input_pos, output_calcvtec, target_date)
 
 if __name__ == "__main__":
     main()

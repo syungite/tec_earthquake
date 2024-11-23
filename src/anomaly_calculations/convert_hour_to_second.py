@@ -4,7 +4,7 @@ import datetime
 def time_to_seconds(dt):
     return dt.hour * 3600 + dt.minute * 60 + dt.second
 
-def main():
+def convert_vtectime_to_seconds():
     for i in range(31):
         input_file_path = f"../data/vtec/vtec_{i}.txt"
         output_file_path = f"../data/vtec/vtec_{i}_output.txt"
@@ -23,12 +23,11 @@ def main():
     
         time_delta = datetime.timedelta(seconds=30)
         start_time = float(start_time)
-        print(start_time)
         total_seconds = int(start_time * 3600)  # 時間を秒に変換して整数化
         hours = total_seconds // 3600           # 時を計算
         minutes = (total_seconds % 3600) // 60  # 残り秒数を分に変換
         seconds = total_seconds % 60            # 残りの秒数
-        print(f"{minutes}:{seconds}")
+        
         # datetime を秒単位に変換
         base_time = datetime.datetime(2011, 3, 11, hour=hours, minute=minutes, second=seconds)
         
@@ -47,5 +46,5 @@ def main():
                 output_file.write(new_line)
 
 if __name__ == "__main__":
-    main()
+    convert_vtectime_to_seconds()
 

@@ -28,7 +28,7 @@ def calculate_distance(coord1, coord2):
     return geodesic(coord1, coord2).kilometers
 
 def process_pos_files(year, month, day, center_coordinate):
-    pos_files = glob.glob(f"../../data/coordinate/{year}/*.pos")
+    pos_files = glob.glob(f"../data/coordinate/{year}/*.pos")
     distances = []
 
     if not pos_files:

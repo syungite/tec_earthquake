@@ -2,7 +2,7 @@
 import os
 import subprocess
 import datetime
-from calculations.vtec_calculator import calculate_vtec
+from tec_calculations.vtec_calculator import calculate_vtec
 
 
 def date_to_day_of_year(year, month, day):
@@ -72,7 +72,6 @@ def call_fortran(year, month, day, i, location):
     # Run Fortran programs
     run_rdeph(nav_file, output_rdeph)
     run_rdrnx(obs_file, output_rdrnx)
-    print("End Fortran processing")
 
 
 if __name__ == "__main__":

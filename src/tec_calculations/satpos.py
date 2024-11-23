@@ -28,7 +28,7 @@ def ecef_to_geodetic(x, y, z):
     
     return lat, lon
 
-def satpos(sat_data_dict, obs_data, OR, NN, NE):
+def satpos(sat_data_dict, obs_data, OR, NN, NE, reference_time):
     """
     ランベルト正角円錐図法で観測点とSIP位置を描画
     """

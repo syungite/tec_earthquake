@@ -28,9 +28,9 @@ def ecef_to_geodetic(x, y, z):
     
     return lat, lon
 
-def satpos(sat_data_dict, obs_data, OR, NN, NE, reference_time):
+def satpos(sat_data_dict, OR, NN, NE, i):
     """
-    ランベルト正角円錐図法で観測点とSIP位置を描画
+    観測点とSIP位置を描画
     """
     # Lambert Conformal Conic projection の設定
     proj = ccrs.Mercator(
@@ -39,7 +39,7 @@ def satpos(sat_data_dict, obs_data, OR, NN, NE, reference_time):
 
     # プロットの作成
     fig, ax = plt.subplots(subplot_kw={'projection': proj}, figsize=(10, 8))
-    ax.set_extent([136, 146, 34, 40], crs=ccrs.PlateCarree())  # 描画範囲
+    ax.set_extent([134, 148, 32, 42], crs=ccrs.PlateCarree())  # 描画範囲
 
     # 海岸線、国境などの特徴を追加
     ax.add_feature(cfeature.COASTLINE)
@@ -51,10 +51,9 @@ def satpos(sat_data_dict, obs_data, OR, NN, NE, reference_time):
 
     # 各時間のSIP位置をプロット
     ax.plot()
-    for stec_time, _ in obs_data:
-        if not (1 < stec_time < 7):  # 時間フィルタリング
+    for stec_time,(x_sat, y_sat, z_sat) in sat_data_dict.items():
+        if not (2.5 < stec_time < 6.5):  # 時間フィルタリング
             continue
-        x_sat, y_sat, z_sat = sat_data_dict.get(stec_time, (None, None, None))
         if x_sat is None:
             continue
 
@@ -70,19 +69,19 @@ def satpos(sat_data_dict, obs_data, OR, NN, NE, reference_time):
         OS_SIP = OR + RS_SIP                 # SIPのECEF座標
         lat, lon = ecef_to_geodetic(OS_SIP[0], OS_SIP[1], OS_SIP[2])
         # SIP位置をプロット
-        if(float(stec_time) - 5.767 == 0): ax.plot(lon, lat, color='k', marker='o', markersize=10, transform=ccrs.PlateCarree())
+        if(float(stec_time) - 5.2 == 0): ax.plot(lon, lat, color='k', marker='o', markersize=10, transform=ccrs.PlateCarree())
         else: ax.plot(lon, lat, 'bo', markersize=4, transform=ccrs.PlateCarree())
     latitude = 38 + 6.2 / 60  
     longitude = 142 + 51.6 / 60  
     ax.plot(longitude, latitude, 'ro', transform=ccrs.PlateCarree())
-    with open("../data/list1.txt", "r") as f:
-        for line in f:
-            lat, lon = map(float, line.strip().split(","))
-            ax.plot(lon, lat, 'ro', markersize=6, transform=ccrs.PlateCarree())
+    # with open("../data/list1.txt", "r") as f:
+    #     for line in f:
+    #         lat, lon = map(float, line.strip().split(","))
+    #         ax.plot(lon, lat, 'ro', markersize=6, transform=ccrs.PlateCarree())
     # 凡例を追加
     ax.legend(loc='lower left')
     plt.title("Satellite SIP Positions (Lambert Conformal Conic Projection)", fontsize=16)
-    plt.savefig("../data/Cartopy.png")
+    plt.savefig(f"../data/Cartopy/Cartopy{i}.png")
     plt.show()
 
 def main():

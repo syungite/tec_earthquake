@@ -1,3 +1,16 @@
+import math
+import numpy as np
+
+def calculate_vector(a, b, c, lat, lon):
+    rlat = math.radians(lat)
+    rlon = math.radians(lon)
+
+    NN = np.array([-math.sin(rlat) * math.cos(rlon), -math.sin(rlat) * math.sin(rlon), math.cos(rlat)])
+    NE = np.array([-math.sin(rlon), math.cos(rlon), 0])
+    OR = np.array([a, b, c])
+    
+    return NN, NE, OR
+
 def extract_coordinates_from_obs(obs_file):
     lat, lon, h = None, None, None
 
@@ -15,8 +28,9 @@ def extract_coordinates_from_obs(obs_file):
 
     if lat is None or lon is None or h is None:
         raise ValueError("緯度、経度、標高がobsファイルから取得できませんでした。")
-
-    return x, y, z, lat, lon
+    
+    NN, NE, OR = calculate_vector(x, y, z, lat, lon)
+    return NN, NE, OR
 
 
 def ecef_to_geodetic(x, y, z):

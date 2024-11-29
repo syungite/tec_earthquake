@@ -1,8 +1,9 @@
 import math
 import glob
 from geopy.distance import geodesic
-from map import read_locations_from_file
+#from map import read_locations_from_file
 def parse_pos_file(file_path, year, month, day):
+    month,day =10, 1
     j_name = None
     coordinates = None
     rinex = None  # rinexの初期化
@@ -28,7 +29,7 @@ def calculate_distance(coord1, coord2):
     return geodesic(coord1, coord2).kilometers
 
 def process_pos_files(year, month, day, center_coordinate):
-    pos_files = glob.glob(f"../data/coordinate/{year}/*.pos")
+    pos_files = glob.glob(f"/home/blue/heki/data/coordinate/{year}/*.pos")
     distances = []
 
     if not pos_files:
@@ -47,10 +48,11 @@ def process_pos_files(year, month, day, center_coordinate):
 
     distances.sort(key=lambda x: x[1])
     # 結果をlist.txtに書き出し
-    with open("../data/list.txt", 'w', encoding='utf-8') as f:
+    with open("/home/blue/heki/data/list.txt", 'w', encoding='utf-8') as f:
         for cnt, (j_name, distance, rinex, coordinates) in enumerate(distances):
             #if cnt < 52 and rinex != '1176':
-            if cnt < 32 and rinex != '1176':
+            if cnt < 34 and rinex != '1170' and rinex != '0761' and rinex != '0351':
+            #if cnt < 31:
                 print(f"{j_name}: {rinex}")
                 f.write(f"{j_name}: {rinex}\n")
                 #lat, lon = coordinates
@@ -58,10 +60,10 @@ def process_pos_files(year, month, day, center_coordinate):
 
 
     # 結果をmap.txtに座標形式で書き出し
-    with open("../data/map.txt", 'w', encoding='utf-8') as f:
+    with open("/home/blue/heki/data/map.txt", 'w', encoding='utf-8') as f:
         for cnt, (j_name, _, rinex, coordinates) in enumerate(distances):
             #if cnt < 52 and rinex != '1176':
-            if cnt < 31:
+            if cnt < 33 and rinex != '1170' and rinex != '0761':
                 lat, lon = coordinates
                 f.write(f"{lat}, {lon}, {j_name}\n")
 
@@ -70,6 +72,6 @@ if __name__ == "__main__":
     year, month, day = 2011, 3, 11
     center_coordinate = (3.6800309526E+01,  1.4075391238E+02)
     process_pos_files(year, month, day, center_coordinate)
-    read_locations_from_file("../data/map.txt")
+    #read_locations_from_file("../../data/map.txt")
 
 

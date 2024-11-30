@@ -27,7 +27,7 @@ def anomaly_plotting(c_t, plotting_path):
         ax.grid(True, color='white', linestyle='-', linewidth=0.5, zorder=3)
         #print(time_labels)
         # Set x-axis major ticks every 30 minutes
-        ax.set_xticks(time_labels[18::60])  # Show every second time point for 30-minute intervals
+        ax.set_xticks(time_labels[::60])  # Show every second time point for 30-minute intervals
 
         # Add vertical lines every 15 minutes (every 30 time points)
         for i in range(0, len(c_t)-18, 30):  # Every 30 time points, which corresponds to 15 minutes

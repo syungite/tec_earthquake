@@ -10,13 +10,9 @@ def date_to_day_of_year(year, month, day):
     date = datetime.datetime(year, month=month, day=day)
     return date.strftime("%j")
 
-
 def ensure_directory_exists(path):
     """Ensure the directory exists; create it if not."""
     os.makedirs(os.path.dirname(path), exist_ok=True)
-
-import os
-import subprocess
 
 def run_rdeph(nav_file, output_rdeph):
     # スクリプトのディレクトリを取得
@@ -61,7 +57,7 @@ def run_rdrnx(obs_file, output_rdrnx):
 def call_fortran(year, month, day, i, location):
     """Call Fortran programs (rdeph and rdrnx) for the given location."""
     day_of_year = date_to_day_of_year(year, month, day)
-    print(f"Processing No.{i} data for location {location}")
+    print(f"Processing No.{i:2d} data for location {location}")
 
     # File paths
     nav_file = f"{location}{day_of_year}0.{str(year)[-2:]}n"

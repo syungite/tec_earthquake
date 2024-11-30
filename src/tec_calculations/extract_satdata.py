@@ -1,11 +1,10 @@
 import re
 
 def deciding_satnum(start_time, end_time):
-    valid_sat = [0 for _ in range(32)]  # 32個の衛星番号のカウント用リスト
-    valid_list = set()  # valid_satに対応する衛星番号を格納するセット
+    satlist = [[] for _ in range(32)]  # hold observation number correspond to each satellite number
+    valid_sat = -1
 
-    # iの範囲(0 <= i <= 30)で繰り返し処理
-    for i in range(31):  # 0 <= i <= 30
+    for i in range(40):  
         stec_file = f"../data/rdrnx/rdrnx_output_{i}.txt"
         current_sat_id = None
         found_start_time = False
@@ -20,7 +19,6 @@ def deciding_satnum(start_time, end_time):
                     match = re.match(r"> sat#\s*(\d+)", cleaned_line)
                     if match:
                         current_sat_id = int(match.group(1))
-                        #print(f"{i} {current_sat_id}")
                         found_start_time = False  # 新しい衛星番号が見つかると、時間のフラグをリセット
                         found_end_time = False
                 else:
@@ -39,18 +37,19 @@ def deciding_satnum(start_time, end_time):
 
                             # 両方が見つかった場合かつ衛星番号が存在する場合のみvalid_satに追加
                             if found_start_time and found_end_time and current_sat_id is not None:
-                                valid_sat[current_sat_id - 1] += 1  # 衛星番号に対するカウントを増やす
+                                satlist[current_sat_id - 1].append(i) 
                                 found_start_time = False  # 同じ衛星で複数追加を防ぐ
                                 found_end_time = False
                         except ValueError:
                             continue
+        
+        for j in range(32):
+            if len(satlist[j]) == 31: # Number of observation points to be obtained
+                valid_sat = j + 1
+                return satlist[j], valid_sat
+    
+    return satlist, valid_sat
 
-    # valid_satの中でカウントが30回になった衛星番号をvalid_listに追加
-    #print(valid_sat)
-    for i, count in enumerate(valid_sat):
-        if count == 31:  # 31回検出された衛星番号をvalid_listに追加
-            valid_list.add(i + 1)  # 衛星番号は1から始まるので、インデックスに+1を加える
-
-    #print("Valid Satellites:", valid_list)
-    return valid_list
+if __name__ == "__main__":
+    deciding_satnum(0, 2)
 

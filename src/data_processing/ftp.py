@@ -38,11 +38,19 @@ def download_and_extract_gz_file(ftp, remote_file_path, local_file_path):
 
         # 解凍成功後、.gzファイルを削除
         os.remove(temp_gz_path)
-        print(f"Downloaded: {local_file_path}")
+        print(f"Downloaded and extracted: {local_file_path}")
 
     except ftplib.error_perm as e:
         print(f"Error downloading {remote_file_path}: {e}")
         
+        # ファイルがダウンロードできなかった場合、空のファイルを作成
+        if not os.path.exists(local_file_path):
+            with open(local_file_path, 'wb') as empty_file:
+                print(f"Created empty file: {local_file_path}")
+    
+    except Exception as e:
+        print(f"Unexpected error: {e}")
+      
 def download_obs_and_nav(year, day_of_year, ftp, rinex_list, local_o_directory, local_n_directory):
     """ RINEXリストから.oファイルと.nファイルをダウンロードして解凍する """
     for rinex_id in rinex_list:

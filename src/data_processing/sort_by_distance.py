@@ -1,9 +1,18 @@
 import math
 import glob
 from geopy.distance import geodesic
-#from map import read_locations_from_file
+
+# 除外するRINEXコードが書かれたファイルを読み込む
+def load_excluded_rinex(file_path):
+    excluded_rinex = set()
+    with open(file_path, 'r', encoding='utf-8') as f:
+        for line in f:
+            excluded_rinex.add(line.strip())  # 改行や空白を除去
+    return excluded_rinex
+
 def parse_pos_file(file_path, year, month, day):
-    month,day =10, 1
+    month, day = 10, 1
+    """POSファイルの解析"""
     j_name = None
     coordinates = None
     rinex = None  # rinexの初期化
@@ -26,9 +35,11 @@ def parse_pos_file(file_path, year, month, day):
     return j_name, coordinates, rinex
 
 def calculate_distance(coord1, coord2):
+    """2地点間の距離を計算"""
     return geodesic(coord1, coord2).kilometers
 
-def process_pos_files(year, month, day, center_coordinate):
+def process_pos_files(year, month, day, center_coordinate, excluded_rinex_file):
+    """POSファイルを処理し、距離を計算"""
     pos_files = glob.glob(f"/home/blue/heki/data/coordinate/{year}/*.pos")
     distances = []
 
@@ -36,9 +47,12 @@ def process_pos_files(year, month, day, center_coordinate):
         print("No .pos files found in the directory.")
         return
 
+    # 除外リストを読み込む
+    excluded_rinex = load_excluded_rinex(excluded_rinex_file)
+
     for file in pos_files:
         j_name, coordinates, rinex = parse_pos_file(file, year, month, day)
-        if j_name and coordinates:
+        if j_name and coordinates and rinex not in excluded_rinex:
             distance = calculate_distance(center_coordinate, coordinates)
             distances.append((j_name, distance, rinex, coordinates))
 
@@ -47,31 +61,31 @@ def process_pos_files(year, month, day, center_coordinate):
         return
 
     distances.sort(key=lambda x: x[1])
+
     # 結果をlist.txtに書き出し
     with open("/home/blue/heki/data/list.txt", 'w', encoding='utf-8') as f:
-        for cnt, (j_name, distance, rinex, coordinates) in enumerate(distances):
-            #if cnt < 52 and rinex != '1176':
-            if cnt < 34 and rinex != '1170' and rinex != '0761' and rinex != '0351':
-            #if cnt < 31:
+        cnt = 0
+        for j_name, distance, rinex, coordinates in distances:
+            if cnt < 40 and rinex not in excluded_rinex:  # 最大40行
                 print(f"{j_name}: {rinex}")
                 f.write(f"{j_name}: {rinex}\n")
-                #lat, lon = coordinates
-                #f.write(f"{lat}, {lon}\n")
-
+                cnt += 1
 
     # 結果をmap.txtに座標形式で書き出し
     with open("/home/blue/heki/data/map.txt", 'w', encoding='utf-8') as f:
-        for cnt, (j_name, _, rinex, coordinates) in enumerate(distances):
-            #if cnt < 52 and rinex != '1176':
-            if cnt < 33 and rinex != '1170' and rinex != '0761':
+        cnt = 0
+        for j_name, _, rinex, coordinates in distances:
+            if cnt < 40 and rinex not in excluded_rinex:  # 除外リストに入っているコードをスキップ
                 lat, lon = coordinates
                 f.write(f"{lat}, {lon}, {j_name}\n")
+                cnt += 1
 
 # 単独で実行された場合
 if __name__ == "__main__":
     year, month, day = 2011, 3, 11
     center_coordinate = (3.6800309526E+01,  1.4075391238E+02)
-    process_pos_files(year, month, day, center_coordinate)
-    #read_locations_from_file("../../data/map.txt")
+    excluded_rinex_file = '/home/blue/heki/data/excluded_rinex.txt'  # 除外リストファイル
+    process_pos_files(year, month, day, center_coordinate, excluded_rinex_file)
+
 
 

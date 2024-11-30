@@ -36,25 +36,24 @@ def extract_sat_data_from_stec(stec_file, sat_number):
                         continue
     return obs_data
 
-def calculate_vtec(input_nav, input_stec, output_file_path, obs_file, sat_number):
+def calculate_vtec(input_satpos, input_stec, output_file_path, obs_file, sat_number):
     NN, NE, OR = extract_coordinates_from_obs(obs_file)
 
-    satellite_data = get_satellite_data(input_nav, sat_number)
-    if satellite_data is None:
+    satellite_pos = get_satellite_data(input_satpos, sat_number)
+    if satellite_pos is None:
         print(f"No data found for satellite number {sat_number}.")
         return
     obs_data = extract_sat_data_from_stec(input_stec, sat_number)
-    #to examine if the obs_data is empty
-    print(obs_data)
+
     output_data = []
-    sat_data_dict = {time: (x, y, z) for time, x, y, z in satellite_data}
+    sat_pos_dict = {time: (x, y, z) for time, x, y, z in satellite_pos}
 
     for stec_time, stec_value in obs_data:
-        if stec_time not in sat_data_dict:
+        if stec_time not in sat_pos_dict:
             print(f"No satellite position data for time {stec_time}, skipping.")
             continue
 
-        x_sat, y_sat, z_sat = sat_data_dict[stec_time]
+        x_sat, y_sat, z_sat = sat_pos_dict[stec_time]
         OS = np.array([x_sat, y_sat, z_sat])
         RS = OS - OR
         rs_length = np.linalg.norm(RS, ord = 2)
@@ -82,13 +81,13 @@ def main():
     sat_number = input("SELECT satellite number: ")
     input_stec = extract_sat_data_from_stec(sat_number, stec_file)
 
-    input_nav = input("Enter the .txt file name for satellite data: ")
+    input_satpos = input("Enter the .txt file name for satellite data: ")
     input_pos = input("Enter the relative path to the position file (default: ../data/00R015.24.pos): ")
     target_date = input("Enter the target date (YYYY MM DD): ")
 
     ref_time = 0
     output_calcvtec = "../data/vtec/vtec_test.txt"
-    calculate_vtec(input_nav, input_stec, input_pos, output_calcvtec, target_date, ref_time)
+    calculate_vtec(input_satpos, input_stec, input_pos, output_calcvtec, target_date, ref_time)
 
 if __name__ == "__main__":
     main()

@@ -157,16 +157,10 @@ def download_and_process_data(year, month, day, timelist):
 
         # FTPセッションを終了
         ftp.quit()
+    print("end ftp connecting")
 
 if __name__ == "__main__":
     year = 2011
     month = 3
     day = 11
     download_and_process_data(year, month, day)
-
-
-
-
-
-
-

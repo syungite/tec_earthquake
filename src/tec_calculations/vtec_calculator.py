@@ -37,6 +37,10 @@ def extract_sat_data_from_stec(stec_file, sat_number):
     return obs_data
 
 def calculate_vtec(input_satpos, input_stec, output_file_path, obs_file, sat_number):
+    """
+    NN, NE, ORという基準ベクトルをつくる
+    -> φを出す
+    """
     NN, NE, OR = extract_coordinates_from_obs(obs_file)
 
     satellite_pos = get_satellite_data(input_satpos, sat_number)

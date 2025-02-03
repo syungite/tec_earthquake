@@ -85,12 +85,13 @@ def calc_anomally_and_plot(start_time, end_time):
             time, vtec = load_vtec_data(vtec_file, t_begin, t_end)
             only_in_time0 = set(time0) - set(time)
             only_in_time = set(time) - set(time0)
-            if(len(only_in_time) > 0 or len(only_in_time0) > 0):
-                print("Only in time0:", only_in_time0)
-                print("Only in time:", only_in_time)
+            # if(len(only_in_time) > 0 or len(only_in_time0) > 0):
+                # print(j)
+                # print("Only in time0:", only_in_time0)
+                # print("Only in time:", only_in_time)
 
             anomaly_0 = cal_anomaly(time0, vtec0, t)
-            anomaly_j = cal_anomaly(time0, vtec, t)
+            anomaly_j = cal_anomaly(time, vtec, t)
             # Every length of anomaly_j is 30 (At 2011/3/11)
             for k in range(30):
                 try:

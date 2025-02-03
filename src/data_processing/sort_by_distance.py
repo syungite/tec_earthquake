@@ -66,7 +66,7 @@ def process_pos_files(year, month, day, center_coordinate, excluded_rinex_file):
     with open("/home/blue/heki/data/list.txt", 'w', encoding='utf-8') as f:
         cnt = 0
         for j_name, distance, rinex, coordinates in distances:
-            if cnt < 40 and rinex not in excluded_rinex:  # 最大40行
+            if cnt < 50 and rinex not in excluded_rinex:  # 最大40行
                 print(f"{j_name}: {rinex}")
                 f.write(f"{j_name}: {rinex}\n")
                 cnt += 1
@@ -75,7 +75,7 @@ def process_pos_files(year, month, day, center_coordinate, excluded_rinex_file):
     with open("/home/blue/heki/data/map.txt", 'w', encoding='utf-8') as f:
         cnt = 0
         for j_name, _, rinex, coordinates in distances:
-            if cnt < 40 and rinex not in excluded_rinex:  # 除外リストに入っているコードをスキップ
+            if cnt < 50 and rinex not in excluded_rinex:  # 除外リストに入っているコードをスキップ
                 lat, lon = coordinates
                 f.write(f"{lat}, {lon}, {j_name}\n")
                 cnt += 1

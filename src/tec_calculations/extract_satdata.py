@@ -11,8 +11,8 @@ def deciding_satnum(start_time, end_time):
     setを使う意味
     例えばstart_time = 10 end_time = 12 とする
     このとき
-    17行目では {8, 9, 10, 11} がcheck_timeに格納される
-    18行目では {7.75, 8, 9, 10, 12} となる
+    18行目では {8, 9, 10, 11} がcheck_timeに格納される
+    19行目では {7.75, 8, 9, 10, 12} となる
     -> start_time = 10.25 のようなコーナーケースにも対応させる
     """
     check_time = set(range(math.ceil(start_time - 2.25), int(end_time) + 1))

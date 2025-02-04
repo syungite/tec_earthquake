@@ -39,7 +39,10 @@ def calculate_distance(coord1, coord2):
     return geodesic(coord1, coord2).kilometers
 
 def process_pos_files(year, month, day, center_coordinate, excluded_rinex_file):
-    """POSファイルを処理し、距離を計算"""
+    """
+    POSファイルを処理し、距離を計算
+    緯度、経度から2地点間の距離を求める
+    """
     pos_files = glob.glob(f"/home/blue/heki/data/coordinate/{year}/*.pos")
     distances = []
 

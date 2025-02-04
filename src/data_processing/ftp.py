@@ -129,6 +129,7 @@ def read_rinex_from_file(file_path):
     return rinex_list
 
 def download_and_process_data(year, month, day, timelist):
+    #A. ftpを利用して国土地理院のデータのダウンロードを自動化
     subprocess.run("rm -f /home/blue/heki/data/obs/*", shell=True)
     subprocess.run("rm -f /home/blue/heki/data/obs/tmp/*", shell=True)
     subprocess.run("rm -f /home/blue/heki/data/nav/*", shell=True)

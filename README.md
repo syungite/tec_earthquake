@@ -1,11 +1,11 @@
 これは
-<b>
+<br>
 https://agupubs.onlinelibrary.wiley.com/doi/10.1002/2016JA023036
-<b>
+<br>
 の論文を自分なりに再現したものです。
 
 fortranの部分は
-<b>
+<br>
 https://www.ep.sci.hokudai.ac.jp/~heki/software.htm
-<b>
+<br>
 を使わせていただきました。

@@ -5,9 +5,10 @@ from tec_calculations.extract_obs_coordinates import extract_coordinates_from_ob
 
 def selecting_sat(input_nav, obs_file, start_time, end_time, valid_sat):
     NN, NE, OR = extract_coordinates_from_obs(obs_file)
+    print(NN, NE, OR)
     best_num, min_rs_sum = -1, float('inf')  # 最小値を無限大で初期化
 
-    for i in range(1, 33):
+    for i in range(1, 40):
         if i not in valid_sat:
             continue
 

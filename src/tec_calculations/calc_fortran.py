@@ -1,4 +1,4 @@
-#calc_fortran (heki/src/calculations/calc_fortran.py)
+#calc_fortran (tec_earthquake/src/calculations/calc_fortran.py)
 import os
 import subprocess
 import datetime
@@ -22,8 +22,8 @@ def run_rdeph(nav_file, output_rdeph):
     fortran_dir = os.path.join(script_dir, "../fortran")
     
     # nav_file と output_rdeph の絶対パスを取得
-    nav_file_abs = os.path.abspath(os.path.join("/home/blue/heki/data/nav", nav_file))
-    output_rdeph_abs = os.path.abspath(os.path.join("/home/blue/heki/data/rdeph", output_rdeph))
+    nav_file_abs = os.path.abspath(os.path.join("/home/blue/tec_earthquake/data/nav", nav_file))
+    output_rdeph_abs = os.path.abspath(os.path.join("/home/blue/tec_earthquake/data/rdeph", output_rdeph))
 
     # コマンドを正しいパスで実行
     command = f"cd {fortran_dir} && ./rdeph < {nav_file_abs} > {output_rdeph_abs}"
@@ -42,8 +42,8 @@ def run_rdrnx(obs_file, output_rdrnx):
     fortran_dir = os.path.join(script_dir, "../fortran")
     
     # nav_file と output_rdeph の絶対パスを取得
-    obs_file_abs = os.path.abspath(os.path.join("/home/blue/heki/data/obs", obs_file))
-    output_rdrnx_abs = os.path.abspath(os.path.join("/home/blue/heki/data/rdrnx", output_rdrnx))
+    obs_file_abs = os.path.abspath(os.path.join("/home/blue/tec_earthquake/data/obs", obs_file))
+    output_rdrnx_abs = os.path.abspath(os.path.join("/home/blue/tec_earthquake/data/rdrnx", output_rdrnx))
 
     # コマンドを正しいパスで実行
     command = f"cd {fortran_dir} && ./rdrnx < {obs_file_abs} > {output_rdrnx_abs}"

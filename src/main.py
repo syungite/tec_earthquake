@@ -13,6 +13,7 @@ output: graph of ionosphere anomaly
 
 import os
 import math
+import datetime
 from concurrent.futures import ProcessPoolExecutor
 from anomaly_calculations import calc_anomaly, convert_hour_to_second, anomaly_plotting
 from data_processing import filterdata, ftp, mapping_points, sort_by_distance
@@ -30,12 +31,24 @@ def main():
     os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
     # 1. パラメータ設定　（基準点の番号、年月日、時間）
-    center_rinex = '0644'
-    year, month, day = 2025, 2, 3
-    start_time, end_time = 21, 23
-    is_recent = True
+    center_rinex = '0214'
+    year, month, day = 2025, 2, 4
+    start_time, end_time = 22, 24
+    
+    # 一日以内かの判定を行う
+    is_recent = False
+    dt_now = datetime.datetime.now()
+    # end_time が　24の時は例外処理
+    if(end_time == 24):
+        dt_search = datetime.datetime(year, month, day, 0)
+        dt_search = dt_search + datetime.timedelta(days=1)
+    else:
+        dt_search = datetime.datetime(year, month, day, end_time)
+    td = dt_now - dt_search
+    if(td <= datetime.timedelta(days=1)):
+        is_recent = True
 
-    # もし一日以内の情報が知りたい場合は　is_recent = true　にしてこの処理を行う
+    # もし一日以内の情報が知りたい場合は　is_recent = true　となりこの処理が行われる
     """
     E. リアルタイムのデータも得られるように変更
     一日前のデータは一時間ごとになっている (cf. それ以前のデータは一日ごと)
@@ -47,16 +60,22 @@ def main():
         timelist = [chr(i + 97) for i in range(math.floor(start_time - 2.25), math.ceil(end_time))]
         print(timelist)
 
+    if(is_recent or year == 2025):
+        pos_year, pos_month, pos_day = 2024, 10, 1
+    else:
+        pos_year, pos_month, pos_day = year, month, day
+
     # 基準点の(緯度、経度)を求める
-    file_name = f"../data/coordinate/2024/{center_rinex}.{24}.pos"
-    j_name, coordinates, rinex = sort_by_distance.parse_pos_file(file_name, 2024, 10, 1)
+    file_name = f"../data/coordinate/{pos_year}/{center_rinex}.{str(pos_year)[-2:]}.pos"
+    j_name, coordinates, rinex = sort_by_distance.parse_pos_file(file_name, pos_year, pos_month, pos_day)
     center_coordinate = (coordinates[0], coordinates[1])
+    print(j_name)
     print(center_coordinate)
 
     #2. 基準点の周囲の50点を観測点とし、ftpを使用してデータを取得
     #A. ftpを利用して国土地理院のデータのダウンロードを自動化
-    excluded_rinex_file = '/home/blue/heki/data/excluded_rinex.txt'
-    sort_by_distance.process_pos_files(2024, 10, 1, center_coordinate, excluded_rinex_file)
+    excluded_rinex_file = '/home/blue/tec_earthquake/data/excluded_rinex.txt'
+    sort_by_distance.process_pos_files(pos_year, pos_month, pos_day, center_coordinate, excluded_rinex_file)
     mapping_points.show_map(center_coordinate)
     ftp.download_and_process_data(year, month, day, timelist)
     print("\033[32mend ftp connecting\033[0m")
@@ -97,10 +116,10 @@ def main():
     print("\n\033[32mstart calculating vtec\033[0m")
     vtec_args = [
         # 引数のリスト
-        (f"/home/blue/heki/data/satpos/rdeph_output_{i}.txt",
-         f"/home/blue/heki/data/stec/rdrnx_output_{i}.txt",
-         f"/home/blue/heki/data/vtec/vtec_{i}.txt",
-         f"/home/blue/heki/data/obs/{loc}{calc_fortran.date_to_day_of_year(year, month, day)}0.{str(year)[-2:]}o",
+        (f"/home/blue/tec_earthquake/data/satpos/rdeph_output_{i}.txt",
+         f"/home/blue/tec_earthquake/data/stec/rdrnx_output_{i}.txt",
+         f"/home/blue/tec_earthquake/data/vtec/vtec_{i}.txt",
+         f"/home/blue/tec_earthquake/data/obs/{loc}{calc_fortran.date_to_day_of_year(year, month, day)}0.{str(year)[-2:]}o",
          valid_sat)
         for i, loc in enumerate(locations)
     ]

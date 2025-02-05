@@ -18,7 +18,7 @@ def filterdata(satlist):
     data_list = []
 
     # list.txt の読み取り
-    with open("/home/blue/heki/data/list.txt", "r", encoding="utf-8") as file:
+    with open("/home/blue/tec_earthquake/data/list.txt", "r", encoding="utf-8") as file:
         for line in file:
             line = line.strip()  # 余分な空白や改行を除去
             if line:  # 空行をスキップ
@@ -27,7 +27,7 @@ def filterdata(satlist):
                 data_list.append((location, code))
     
     # listfilter.txt に対応する場所を書き込む
-    with open("/home/blue/heki/data/listfilter.txt", "w", encoding="utf-8") as filter_file:
+    with open("/home/blue/tec_earthquake/data/listfilter.txt", "w", encoding="utf-8") as filter_file:
         for i in satlist:
             location, code = data_list[i]  # インデックスに対応する場所
             filter_file.write(f"{location}: {code}\n")
@@ -35,16 +35,16 @@ def filterdata(satlist):
     # ファイルコピー処理
     for new_index, original_index in enumerate(satlist):
         # rdeph ディレクトリのファイルをコピーし、rdeph_output_0.txt, rdeph_output_1.txt,... に変更
-        source_file_pattern_rdeph = "/home/blue/heki/data/rdeph/rdeph_output_{i}.txt"
-        source_file_pattern_rdrnx = "/home/blue/heki/data/rdrnx/rdrnx_output_{i}.txt"
+        source_file_pattern_rdeph = "/home/blue/tec_earthquake/data/rdeph/rdeph_output_{i}.txt"
+        source_file_pattern_rdrnx = "/home/blue/tec_earthquake/data/rdrnx/rdrnx_output_{i}.txt"
         
-        dest_dir = "/home/blue/heki/data/satpos/rdeph_"
+        dest_dir = "/home/blue/tec_earthquake/data/satpos/rdeph_"
         
         # rdeph 出力ファイルをコピー
         copy_file_with_new_name(source_file_pattern_rdeph, dest_dir, new_index, original_index)
         
         # rdrnx 出力ファイルをコピー
-        dest_dir_rdrnx = "/home/blue/heki/data/stec/rdrnx_"  # 別のディレクトリにコピー
+        dest_dir_rdrnx = "/home/blue/tec_earthquake/data/stec/rdrnx_"  # 別のディレクトリにコピー
         copy_file_with_new_name(source_file_pattern_rdrnx, dest_dir_rdrnx, new_index, original_index)
 
 # 呼び出し例

@@ -43,7 +43,7 @@ def process_pos_files(year, month, day, center_coordinate, excluded_rinex_file):
     POSファイルを処理し、距離を計算
     緯度、経度から2地点間の距離を求める
     """
-    pos_files = glob.glob(f"/home/blue/heki/data/coordinate/{year}/*.pos")
+    pos_files = glob.glob(f"/home/blue/tec_earthquake/data/coordinate/{year}/*.pos")
     distances = []
 
     if not pos_files:
@@ -66,7 +66,7 @@ def process_pos_files(year, month, day, center_coordinate, excluded_rinex_file):
     distances.sort(key=lambda x: x[1])
 
     # 結果をlist.txtに書き出し
-    with open("/home/blue/heki/data/list.txt", 'w', encoding='utf-8') as f:
+    with open("/home/blue/tec_earthquake/data/list.txt", 'w', encoding='utf-8') as f:
         cnt = 0
         for j_name, distance, rinex, coordinates in distances:
             if cnt < 50 and rinex not in excluded_rinex:  # 最大40行
@@ -75,7 +75,7 @@ def process_pos_files(year, month, day, center_coordinate, excluded_rinex_file):
                 cnt += 1
 
     # 結果をmap.txtに座標形式で書き出し
-    with open("/home/blue/heki/data/map.txt", 'w', encoding='utf-8') as f:
+    with open("/home/blue/tec_earthquake/data/map.txt", 'w', encoding='utf-8') as f:
         cnt = 0
         for j_name, _, rinex, coordinates in distances:
             if cnt < 50 and rinex not in excluded_rinex:  # 除外リストに入っているコードをスキップ
@@ -87,7 +87,7 @@ def process_pos_files(year, month, day, center_coordinate, excluded_rinex_file):
 if __name__ == "__main__":
     year, month, day = 2011, 3, 11
     center_coordinate = (3.6800309526E+01,  1.4075391238E+02)
-    excluded_rinex_file = '/home/blue/heki/data/excluded_rinex.txt'  # 除外リストファイル
+    excluded_rinex_file = '/home/blue/tec_earthquake/data/excluded_rinex.txt'  # 除外リストファイル
     process_pos_files(year, month, day, center_coordinate, excluded_rinex_file)
 
 
